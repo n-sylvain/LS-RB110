@@ -126,7 +126,7 @@ row number: 4 --> sum of integers in row: 68
 1. Create an empty 'rows' array to contain all of the rows
 2. Create a 'row' array and add it to the overall 'rows' array
 3. Repeat step 2 until all the necessary rows have been created
-  - A;; rows have been created when the length of the 'rows' array is equal to the input integer
+  - All rows have been created when the length of the 'rows' array is equal to the input integer
 4. Sum the final row
 5. Return the sum
 
@@ -156,5 +156,7 @@ Algorithm:
 2. Add the starting integer
 3. Increment the starting integer by 2 to get the next integer in the sequence
 4. Repeat steps 2 & 3 until the array has reached the correct length
-5. Return the array
+5. Return the 'row' array
+
+## Final Thoughts
 
