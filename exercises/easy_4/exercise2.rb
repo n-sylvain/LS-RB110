@@ -1,13 +1,13 @@
 def century(year)
   cent = year % 100 > 0 ? year / 100 + 1 : year / 100
   if cent % 10 == 1
-    return cent % 100 == 11 ? "#{cent}th" : "#{cent}st"
+    cent % 100 == 11 ? "#{cent}th" : "#{cent}st"
   elsif cent % 10 == 2
-    return cent % 100 == 12 ? "#{cent}th" : "#{cent}nd"
+    cent % 100 == 12 ? "#{cent}th" : "#{cent}nd"
   elsif cent % 10 == 3
-    return cent % 100 == 13 ? "#{cent}th" : "#{cent}rd"
+    cent % 100 == 13 ? "#{cent}th" : "#{cent}rd"
   else
-    return "#{cent}th"
+    "#{cent}th"
   end
 end
 
