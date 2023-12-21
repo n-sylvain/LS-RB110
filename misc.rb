@@ -1,28 +1,38 @@
-# example_10.rb
+WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
+                [[1, 5, 9], [3, 5, 7]]              # diagonals
 
-require "pry"
-require "pry-byebug"
-
-=begin
-Write method that takes as an argument an array of integers and returns a new array with
-the integers transformed. If the integer is divisible by 3 it should be replaced with "Fizz",
-if divisible by 5 it should be replaced with "Buzz", if divisible by both 3 and 5 it should be
-replaced with "FizzBuzz", if divisible by neither 3 or 5 the number should remain as it is
-=end
-
-def fizzbuzz(arr)
-  arr.map do |num|
-    # binding.pry
-    if num % 5 == 0 && num % 3 == 0
-      'FizzBuzz'
-    elsif num % 5 == 0
-      'Buzz'
-    elsif num % 3 == 0
-      'Fizz'
-    else
-      num
-    end
-  end
+def initialize_board
+  new_board = {}
+  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
+  new_board
 end
 
-p fizzbuzz([1, 3, 5, 6, 7, 8, 10, 3, 15, 9]) # == [1, 'Fizz', 'Buzz', 'Fizz', 7, 8, 'Buzz', 'Fizz', 'FizzBuzz', 'Fizz']
+def empty_position_line(brd, marker)
+  WINNING_LINES.each do |line|
+    if brd.values_at(line[0], line[1], line[2]).count(marker) == 2
+      brd.values_at(line[0], line[1], line[2]).each_with_index do |element, index|
+        target = index if element == marker
+      end
+      return [true, target]
+    end
+  end
+  [false, 0]
+end
+
+array = ["X", "X", " "]
+
+def defense(array)
+  position = 0
+  array.each_with_index do |element, index|
+    position = index if element == ' '
+  end
+  position
+end
+
+p defense(array)
+
+
+=begin
+
+=end
