@@ -1,10 +1,9 @@
-
-require 'pry'
-
 CARD_VALUE = {
   "2" => 2, "3" => 3, "4" => 4, "5" => 5, "6" => 6, "7" => 7, "8" => 8,
   "9" => 9, "10" => 10, "jack" => 10, "queen" => 10, "king" => 10, "ace" => 11
 }
+GAME_LIMIT = 21
+DEALER_LIMIT = 17
 
 def prompt(msg)
   puts "=>  #{msg}"
@@ -23,9 +22,10 @@ def initialize_deck
 end
 
 # rubocop:disable Metrics/methodLength, Metrics/AbcSize
-def display_board(dealer_deck, dealer_score, player_deck, player_score, hide: false)
+def display_board(dealer_deck, dealer_score,
+                  player_deck, player_score, hide: false)
   system 'clear'
-  puts '21 (light version)'.center(26)
+  puts "#{GAME_LIMIT} (light version)".center(26)
   puts ''
   puts 'SCORE BOARD'.center(26)
   puts "DEALER: #{dealer_score}".center(26)
@@ -79,11 +79,7 @@ def update_hand_value(table_deck, hide: false)
 
   result = values.sum
   while aces.size > 0
-    result = if 11 + result > 21
-               result + 1
-             else
-               result + 11
-             end
+    result = (11 + result > GAME_LIMIT ? result + 1 : result + 11)
     aces.pop
   end
 
@@ -104,9 +100,9 @@ end
 def player_choice
   move = ''
   loop do
-    prompt "Press 1 for 'HIT', press 2 for 'STAY'"
+    prompt "Press 1 to 'HIT', press 2 to for 'STAY'"
     move = gets.chomp.to_i
-    break if move == 1 || move == 2
+    break if [1, 2].include?(move)
     prompt "Sorry, that's not a valid choice."
   end
   move
@@ -117,11 +113,12 @@ def player_deck_update(player_deck, deck)
   player_deck
 end
 
-def round_score_update(dealer_hand_value, player_hand_value, dealer_score, player_score)
-  if dealer_hand_value <= 21 && dealer_hand_value > player_hand_value
+def round_score_update(dealer_hand_value, player_hand_value,
+                       dealer_score, player_score)
+  if dealer_hand_value <= GAME_LIMIT && dealer_hand_value > player_hand_value
     prompt "DEALER wins this round."
     dealer_score += 1
-  elsif dealer_hand_value > 21 || player_hand_value > dealer_hand_value
+  elsif dealer_hand_value > GAME_LIMIT || player_hand_value > dealer_hand_value
     prompt "PLAYER wins this round!"
     player_score += 1
   elsif player_hand_value == dealer_hand_value
@@ -131,55 +128,79 @@ def round_score_update(dealer_hand_value, player_hand_value, dealer_score, playe
 end
 
 # START
-dealer_score = 0
-player_score = 0
-
 loop do
-  deck = initialize_deck
-  dealer_deck = []
-  player_deck = []
+  dealer_score = 0
+  player_score = 0
 
-  initial_card_distribution(deck, dealer_deck, player_deck)
-  # binding.pry
-
-  loop do
-    player_hand_value = update_hand_value(player_deck)
-    display_board(dealer_deck, dealer_score, player_deck, player_score, hide: true)
-
-    if player_hand_value == 21
-      prompt "PLAYER wins this round!"
-      player_score += 1
-      break
-    elsif player_hand_value > 21
-      prompt "BUST! You are over 21."
-      prompt "DEALER wins this round."
-      dealer_score += 1
-      break
-    end
-
-    choice = player_choice
-    if choice == 1
-      player_deck = player_deck_update(player_deck, deck)
-    elsif choice == 2
-      dealer_hand_value = 0
-      loop do
-        prompt "DEALER's move."
-        sleep 1
-        dealer_hand_value = update_hand_value(dealer_deck)
-        display_board(dealer_deck, dealer_score, player_deck, player_score)
-        break if dealer_hand_value >= 17
-        dealer_deck = player_deck_update(dealer_deck, deck) if dealer_hand_value < 17
-      end
-
-      display_board(dealer_deck, dealer_score, player_deck, player_score)
-      dealer_score, player_score = round_score_update(dealer_hand_value, player_hand_value,
-                                                      dealer_score, player_score)
-      break
-    end
-  end
-
+  system 'clear'
+  puts "Welcome to the game of #{GAME_LIMIT}"
   prompt "Press any key to continue"
   gets.chomp
+
+  loop do
+    deck = initialize_deck
+    dealer_deck = []
+    player_deck = []
+
+    initial_card_distribution(deck, dealer_deck, player_deck)
+
+    loop do
+      player_hand_value = update_hand_value(player_deck)
+      display_board(dealer_deck, dealer_score,
+                    player_deck, player_score, hide: true)
+
+      if player_hand_value == GAME_LIMIT
+        prompt "PLAYER wins this round!"
+        player_score += 1
+        break
+      elsif player_hand_value > GAME_LIMIT
+        prompt "BUST! You are over #{GAME_LIMIT}."
+        prompt "DEALER wins this round."
+        dealer_score += 1
+        break
+      end
+
+      choice = player_choice
+      if choice == 1
+        player_deck = player_deck_update(player_deck, deck)
+      elsif choice == 2
+        dealer_hand_value = 0
+        loop do
+          prompt "DEALER's move."
+          sleep 1
+          dealer_hand_value = update_hand_value(dealer_deck)
+          display_board(dealer_deck, dealer_score, player_deck, player_score)
+          if dealer_hand_value < DEALER_LIMIT
+            dealer_deck = player_deck_update(dealer_deck, deck)
+          elsif dealer_hand_value >= DEALER_LIMIT
+            break
+          end
+        end
+
+        display_board(dealer_deck, dealer_score, player_deck, player_score)
+        dealer_score, player_score = round_score_update(dealer_hand_value,
+                                                        player_hand_value,
+                                                        dealer_score,
+                                                        player_score)
+        break
+      end
+    end
+
+    if player_score == 5 || dealer_score == 5
+      sleep 2
+      display_board(dealer_deck, dealer_score, player_deck, player_score)
+      prompt "PLAYER WINS THE GAME!" if player_score == 5
+      prompt "GAME OVER. DEALER WINS THE GAME!" if dealer_score == 5
+      break
+    end
+
+    prompt "Press any key to continue"
+    gets.chomp
+  end
+
+  prompt "Play again? (y or n)"
+  answer = gets.chomp
+  break unless answer.downcase.start_with?('y')
 end
 
-display_board(dealer_deck, dealer_score, player_deck, player_score, hide: false)
+prompt "Thanks for playing #{GAME_LIMIT}! Good Bye!"
