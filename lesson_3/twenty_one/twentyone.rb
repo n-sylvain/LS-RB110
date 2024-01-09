@@ -78,10 +78,17 @@ def update_hand_value(table_deck, hide: false)
   end
 
   result = values.sum
-  while aces.size > 0
-    result = (11 + result > GAME_LIMIT ? result + 1 : result + 11)
-    aces.pop
+
+  case aces.size
+  when 4 then result = (14 + result > GAME_LIMIT ? result + 4 : result + 14)
+  when 3 then result = (13 + result > GAME_LIMIT ? result + 3 : result + 13)
+  when 2 then result = (12 + result > GAME_LIMIT ? result + 2 : result + 12)
+  when 1 then result = (11 + result > GAME_LIMIT ? result + 1 : result + 11)
   end
+  # while aces.size > 0 # needs to update, does not handle edge case of more than 2 aces.
+  #   result = (11 + result > GAME_LIMIT ? result + 1 : result + 11) if aces.size == 1
+  #   aces.pop
+  # end
 
   result
 end
