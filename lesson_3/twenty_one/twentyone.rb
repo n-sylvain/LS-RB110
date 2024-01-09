@@ -22,8 +22,8 @@ def initialize_deck
 end
 
 # rubocop:disable Metrics/methodLength, Metrics/AbcSize
-def display_board(dealer_deck, dealer_score,
-                  player_deck, player_score, hide: false)
+def display_board(dealer_cards, dealer_score,
+                  player_cards, player_score, hide: false)
   system 'clear'
   puts "#{GAME_LIMIT} (light version)".center(26)
   puts ''
@@ -32,19 +32,19 @@ def display_board(dealer_deck, dealer_score,
   puts "PLAYER: #{player_score}".center(26)
   puts ''
   puts ''
-  puts 'DEALER DECK'.center(26)
+  puts "DEALER's CARDS".center(26)
   if hide
-    puts "deck value : #{update_hand_value(dealer_deck, hide: true)}".center(26)
-    puts display_deck(dealer_deck, hide: true)
+    puts "deck value : #{update_hand_value(dealer_cards, hide: true)}".center(26)
+    puts display_deck(dealer_cards, hide: true)
   else
-    puts "deck value : #{update_hand_value(dealer_deck)}".center(26)
-    puts display_deck(dealer_deck)
+    puts "deck value : #{update_hand_value(dealer_cards)}".center(26)
+    puts display_deck(dealer_cards)
   end
   puts ''
   puts ''
-  puts display_deck(player_deck)
-  puts "deck value : #{update_hand_value(player_deck)}".center(26)
-  puts 'PLAYER DECK'.center(26)
+  puts display_deck(player_cards)
+  puts "deck value : #{update_hand_value(player_cards)}".center(26)
+  puts "PLAYER's CARDS".center(26)
   puts ''
 end
 # rubocop:enable Metrics/methodLength, Metrics/AbcSize
@@ -86,10 +86,10 @@ def update_hand_value(table_deck, hide: false)
   result
 end
 
-def initial_card_distribution(deck, dealer_deck, player_deck)
+def initial_card_distribution(deck, dealer_cards, player_cards)
   1.upto(4) do |index|
-    player_deck << distribute_card!(deck) if index.even?
-    dealer_deck << distribute_card!(deck) if index.odd?
+    player_cards << distribute_card!(deck) if index.even?
+    dealer_cards << distribute_card!(deck) if index.odd?
   end
 end
 
@@ -108,9 +108,9 @@ def player_choice
   move
 end
 
-def player_deck_update(player_deck, deck)
-  player_deck << distribute_card!(deck)
-  player_deck
+def player_cards_update(player_cards, deck)
+  player_cards << distribute_card!(deck)
+  player_cards
 end
 
 def round_score_update(dealer_hand_value, player_hand_value,
@@ -139,15 +139,15 @@ loop do
 
   loop do
     deck = initialize_deck
-    dealer_deck = []
-    player_deck = []
+    dealer_cards = []
+    player_cards = []
 
-    initial_card_distribution(deck, dealer_deck, player_deck)
+    initial_card_distribution(deck, dealer_cards, player_cards)
 
     loop do
-      player_hand_value = update_hand_value(player_deck)
-      display_board(dealer_deck, dealer_score,
-                    player_deck, player_score, hide: true)
+      player_hand_value = update_hand_value(player_cards)
+      display_board(dealer_cards, dealer_score,
+                    player_cards, player_score, hide: true)
 
       if player_hand_value == GAME_LIMIT
         prompt "PLAYER wins this round!"
@@ -162,22 +162,22 @@ loop do
 
       choice = player_choice
       if choice == 1
-        player_deck = player_deck_update(player_deck, deck)
+        player_cards = player_cards_update(player_cards, deck)
       elsif choice == 2
         dealer_hand_value = 0
         loop do
           prompt "DEALER's move."
           sleep 1
-          dealer_hand_value = update_hand_value(dealer_deck)
-          display_board(dealer_deck, dealer_score, player_deck, player_score)
+          dealer_hand_value = update_hand_value(dealer_cards)
+          display_board(dealer_cards, dealer_score, player_cards, player_score)
           if dealer_hand_value < DEALER_LIMIT
-            dealer_deck = player_deck_update(dealer_deck, deck)
+            dealer_cards = player_cards_update(dealer_cards, deck)
           elsif dealer_hand_value >= DEALER_LIMIT
             break
           end
         end
 
-        display_board(dealer_deck, dealer_score, player_deck, player_score)
+        display_board(dealer_cards, dealer_score, player_cards, player_score)
         dealer_score, player_score = round_score_update(dealer_hand_value,
                                                         player_hand_value,
                                                         dealer_score,
@@ -188,7 +188,7 @@ loop do
 
     if player_score == 5 || dealer_score == 5
       sleep 2
-      display_board(dealer_deck, dealer_score, player_deck, player_score)
+      display_board(dealer_cards, dealer_score, player_cards, player_score)
       prompt "PLAYER WINS THE GAME!" if player_score == 5
       prompt "GAME OVER. DEALER WINS THE GAME!" if dealer_score == 5
       break
