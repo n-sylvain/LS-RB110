@@ -11,8 +11,7 @@ AGENDA - ASSESSMENT PREP
 
   => Interview Assessment
     - 1 hour / 2 problems
-    - Focus: structured problem solving, Ruby fluency, and
-      communication ability
+    - Focus: structured problem solving, Ruby fluency, and communication ability
     - No documentation, ok to test out in IRB, no copy and pasting PEDAC template.
     - Be sure to complete PEDA before moving on to C - most successful student spend time on PEDA
     - Test code early and often
