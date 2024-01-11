@@ -1,6 +1,6 @@
 # The PEDAC Process
 
-## P; Understanding the Problem
+## P: Understanding the Problem
 
 - Establish the rules/ define the boundaries of the problem
   - Assess available information
